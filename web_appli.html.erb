@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  </head>
+  <body>
+    <h1>Web Application exercice</h1>
+    <% require 'pg' %>
+    <% connection = PG::connect(dbname: "goya") %>
+    <% connection.internal_encoding = "UTF-8" %>
+    <% result = connection.exec("SELECT length, weight, quality, date, crops.give_for, price FROM crops JOIN prices ON crops.give_for=prices.give_for WHERE crops.give_for!='自家消費';") %>
+    <% good_data = [] %>
+    <% result.each do |record| %>
+      <%  good_data << "Length：#{record["length"]} Weight:#{record["weight"]} Qualité:#{record["quality"]} Date:#{record["date"]} Destiné à: #{record["give_for"]} Prix: #{record["price"]}" %>
+      <%  good_data << "\n" %>
+    <% end %>
+    <form action="good_goya.cgi" method="POST">
+       Cliquez sur le bouton ci-dessous pour voir les informations sur goya qui n'ont pas le critère consommation personnelle<br><br>
+       <input type="text" name="good_goya" value="<%= good_data.join(' ') %>">
+      <input type="submit" name="Send" >
+    </form>
+
+    <% result2 = connection.exec("SELECT length, weight, quality, date, crops.give_for, price FROM crops JOIN prices ON crops.give_for=prices.give_for WHERE crops.quality='f';") %>
+    <% quality_data = [] %>
+    <% result2.each do |record| %>
+      <%  quality_data << "Length：#{record["length"]} Weight:#{record["weight"]} Qualité:#{record["quality"]} Date:#{record["date"]} Destiné à: #{record["give_for"]} Prix: #{record["price"]}" %>
+      <%  quality_data << "\n" %>
+    <% end %>
+    <form action="quality_goya.cgi" method="POST">
+       Cliquez sur le bouton ci-dessous pour voir les informations sur goya qui ont une mauvaise qualité<br><br>
+       <input type="text" name="quality_goya" value="<%= quality_data.join(' ') %>">
+      <input type="submit" name="Send" >
+    </form>
+  </body>
+</html>

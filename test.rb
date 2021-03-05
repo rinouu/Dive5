@@ -1,6 +1,23 @@
 require 'webrick'
+require 'erb'
+
+
+erb_file = './web_appli.html.erb'
+html_file = File.basename(erb_file, '.erb')#=>"page.html"
+
+erb_str = File.read(erb_file)
+
+renderer = ERB.new(erb_str)
+result = renderer.result()
+
+File.open(html_file, 'w') do |f|
+  f.write(result)
+end
+
+path=File.expand_path'./web_appli.html'
+
 server = WEBrick::HTTPServer.new({
-  :DocumentRoot => '.',
+  :DocumentRoot => path,
   :CGIInterpreter => WEBrick::HTTPServlet::CGIHandler::Ruby,
   :Port => '3000',
 })

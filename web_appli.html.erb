@@ -7,9 +7,28 @@
     <% require 'pg' %>
     <% connection = PG::connect(dbname: "goya") %>
     <% connection.internal_encoding = "UTF-8" %>
-    <% result = connection.exec("SELECT length, weight, quality, date, crops.give_for, price FROM crops JOIN prices ON crops.give_for=prices.give_for WHERE crops.give_for!='自家消費';") %>
-    <% good_data = [] %>
+    <form action="indicate.cgi" method="POST">
+       Please enter the characters below<br><br>
+      <input type="text"  name="input" ><br>
+      <input type="submit" name="Send" >
+    </form>
+    <% result = connection.exec("select weight, give_for from crops;") %>
+    <% data = [] %>
     <% result.each do |record| %>
+      <%  data << "The size of bitter gourd：#{record["weight"]}　Who sold：#{record["give_for"]}" %>
+    <% end %>
+    <form action="department.cgi" method="POST">
+       Press the button below to jump to the information page of the size of bitter gourd and the person who sold it.<br><br>
+       <!-- Substitute the data you want to send for value -->
+       <!-- Use name = "goya" as a marker for information -->
+      <input type="text" name="department" value="<%= data.join(' ') %>">
+      <input type="submit" name="Send" >
+    </form>
+
+    
+    <% result2 = connection.exec("SELECT length, weight, quality, date, crops.give_for, price FROM crops JOIN prices ON crops.give_for=prices.give_for WHERE crops.give_for!='自家消費';") %>
+    <% good_data = [] %>
+    <% result2.each do |record| %>
       <%  good_data << "Length：#{record["length"]} Weight:#{record["weight"]} Qualité:#{record["quality"]} Date:#{record["date"]} Destiné à: #{record["give_for"]} Prix: #{record["price"]}" %>
       <%  good_data << "\n" %>
     <% end %>
@@ -19,9 +38,9 @@
       <input type="submit" name="Send" >
     </form>
 
-    <% result2 = connection.exec("SELECT length, weight, quality, date, crops.give_for, price FROM crops JOIN prices ON crops.give_for=prices.give_for WHERE crops.quality='f';") %>
+    <% result3 = connection.exec("SELECT length, weight, quality, date, crops.give_for, price FROM crops JOIN prices ON crops.give_for=prices.give_for WHERE crops.quality='f';") %>
     <% quality_data = [] %>
-    <% result2.each do |record| %>
+    <% result3.each do |record| %>
       <%  quality_data << "Length：#{record["length"]} Weight:#{record["weight"]} Qualité:#{record["quality"]} Date:#{record["date"]} Destiné à: #{record["give_for"]} Prix: #{record["price"]}" %>
       <%  quality_data << "\n" %>
     <% end %>
